@@ -1,5 +1,6 @@
 const url = 'https://receitasapi-b-2025.vercel.app';
 const receitas = [];
+let receitaAtual = null;
 
 carregarReceitas();
 
@@ -27,6 +28,53 @@ function listarCards(){
         <img src="${receita.img}"alt="${receita.nome}">
         <p>Custo Aproximado: ${receita.custoAproximado}</p>
         `;
+        card.onclick = () => abrirReceita(receita);
+
         container.appendChild(card);
     });
 }
+
+function abrirReceita(receita){
+    receitaAtual = receita;
+    tituloReceita.innerText = receita.nome;
+    nomeEdit.value = receita.nome;
+    imgReceita.src = receita.img;
+    imgEdit.value = receita.img;
+    tipoEdit.value = receita.tipo;
+    ingredientesEdit.value = receita.ingredientes;
+    modoEdit.value = receita.modoFazer;
+    custoEdit.value = receita.custoAproximado;
+    detalhes.classList.remove('oculto');
+
+}
+imgEdit.addEventListener("input", ()=>{
+    imgReceita.src = imgEdit.value;
+});
+
+document.querySelector('#formCad').addEventListener('submit', function(e){
+    e.preventDefault();
+    const novaReceita = {
+        nome: nome.value,
+        tipo: tipo.value,
+        ingredientes: ingredientes.value,
+        modoFazer: modoFazer.value,
+        img: urlImagem.value,
+        custoAproximado: custoAproximado.value ? Number(custoAproximado.value) : null
+    };
+
+    fetch(url + '/receitas',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify(novaReceita)
+    })
+
+.then(()=>{
+    alert("Receita adicionada com sucesso!");
+    cadastro.classList.add('oculto');
+    carregarReceitas();
+})
+.catch(()=>alert("Erro ao salvar receita"));
+
+});
